@@ -14,7 +14,9 @@ Vagrant.configure("2") do |config|
         static.vm.provision "shell", inline: <<-SHELL
             apt-get update
             apt-get install -y apache2 php libapache2-mod-php
-            echo "Complite static vm"
+            rm /var/www/html/index.html
+            wget https://raw.githubusercontent.com/narko2t/devops-hometasks/master/01-vagrant/index.html -O /var/www/html/index.html
+            systemctl restart apache2
         SHELL
     end
 
@@ -31,7 +33,11 @@ Vagrant.configure("2") do |config|
         dinamic.vm.provision "shell", inline: <<-SHELL
             apt-get update
             apt-get install -y apache2 php libapache2-mod-php
-            echo "Complite dinamic vm"
+            rm /etc/apache2/sites-available/000-default.conf
+            wget https://raw.githubusercontent.com/narko2t/devops-hometasks/master/01-vagrant/2/000-default.conf -O /etc/apache2/sites-available/000-default.conf
+            mkdir /var/www/dinamic
+            wget https://raw.githubusercontent.com/narko2t/devops-hometasks/master/01-vagrant/index.php -O /var/www/dinamic/index.php
+            systemctl restart apache2
         SHELL
     end
 
