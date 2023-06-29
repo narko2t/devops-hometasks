@@ -1,0 +1,22 @@
+Vagrant.configure("2") do |config|
+  config.vm.box = "generic/debian11"
+
+  config.vm.network "forwarded_port", guest: 8080, host: 8080
+  config.vm.network "forwarded_port", guest: 8081, host: 8081
+  
+  config.vm.provider "virtualbox" do |ansible|
+    ansible.name = "ansiible_1.vm"
+  end
+
+  #config.vm.provision "file", source: "inventory.ini", destination: "/home/vagrant/inventory.ini"
+  #config.vm.provision "file", source: "playbook.yml", destination: "/home/vagrant/playbook.yml"
+
+  config.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y ansible
+    cp https://raw.githubusercontent.com/narko2t/devops-hometasks/master/02-ansible/1/playbook.yml /home/vagrant/playbook.yml
+    cp https://raw.githubusercontent.com/narko2t/devops-hometasks/master/02-ansible/1/inventory.ini /home/vagrant/inventory.ini
+    cd /home/vagrant/
+    ansible-playbook -i inventory.ini playbook.yml
+  SHELL
+end

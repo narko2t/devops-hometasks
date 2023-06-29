@@ -1,0 +1,59 @@
+---
+- hosts: all
+  become: true
+  
+  tasks:
+    - name: Install Apache and PHP
+      apt:
+        name: 
+        - apache2
+        - php
+        - libapache2-mod-php
+        state: present
+      tags: apache_php
+
+    - name: Copy static HTML file to the VM
+      get_url:
+        url: "https://raw.githubusercontent.com/narko2t/devops-hometasks/master/01-vagrant/index.html" # new HTML file
+        dest: /var/www/html/index.html # old HTML file
+      notify: Restart Apache
+
+    - name: Create directory php
+      file:
+        path: /var/www/php
+        state: directory
+    - name: Copy php file
+      get_url:
+        url: "https://raw.githubusercontent.com/narko2t/devops-hometasks/master/01-vagrant/index.php" # new HTML file
+        dest: /var/www/php/index.php
+      notify: Restart Apache
+
+    - name: Changing port 80 to 8080
+      replace:
+        path: /etc/apache2/sites-available/000-default.conf
+        regexp: '80'
+        replace: '8080'
+    - name: Changing 000-default configs
+      blockinfile:
+        path: /etc/apache2/sites-available/000-default.conf
+        block: |
+          <VirtualHost *:8081>
+              ServerAdmin webmaster@localhost
+              DocumentRoot /var/www/php
+              ErrorLog ${APACHE_LOG_DIR}/php_error.log
+              CustomLog ${APACHE_LOG_DIR}/php_access.log combined
+          </VirtualHost>
+    - name: Changing port configs
+      lineinfile:
+        path: /etc/apache2/ports.conf
+        regexp: '^Listen\s+80$'
+        line: |
+          Listen 8080
+          Listen 8081
+      notify: Restart Apache
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
