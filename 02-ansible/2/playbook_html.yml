@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  become: true
+  
+  tasks:
+    - name: Install Apache
+      apt:
+        name: apache2
+        state: present
+
+    - name: Copy HTML file to the VM
+      get_url:
+        url: "https://raw.githubusercontent.com/narko2t/devops-hometasks/master/01-vagrant/index.html" # new HTML file
+        dest: /var/www/html/index.html # old HTML file
+      notify: Restart Apache
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted

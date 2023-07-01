@@ -1,0 +1,54 @@
+Vagrant.configure("2") do |config|
+
+  # Настройки первой виртуальной машины (статический сайт)
+  config.vm.define "static" do |html|
+    html.vm.box = "generic/debian11"
+    html.vm.network "private_network", ip: "192.168.33.11"
+    html.vm.hostname = "static"
+    html.vm.provider "virtualbox" do |html|
+      html.memory = 512
+      html.cpus = 1
+    end
+    html.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y ansible
+    wget https://raw.githubusercontent.com/narko2t/devops-hometasks/master/02-ansible/2/playbook_html.yml -O /home/vagrant/playbook.yml
+    ansible-playbook playbook.yml
+    SHELL
+  end
+
+  # Настройки второй виртуальной машины (динамический сайт)
+  config.vm.define "dynamic" do |php|
+    php.vm.box = "generic/debian11"
+    php.vm.network "private_network", ip: "192.168.33.12"
+    php.vm.hostname = "dynamic"
+    php.vm.provider "virtualbox" do |php|
+      php.memory = 512
+      php.cpus = 1
+    end
+    php.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y ansible
+    wget https://raw.githubusercontent.com/narko2t/devops-hometasks/master/02-ansible/2/playbook_php.yml -O /home/vagrant/playbook.yml
+    ansible-playbook playbook.yml
+    SHELL
+  end
+
+  # Настройки третьей виртуальной машины (nginx reverse proxy)
+  config.vm.define "proxy" do |nginx|
+    nginx.vm.box = "generic/debian11"
+    nginx.vm.network "private_network", ip: "192.168.33.13"
+    nginx.vm.hostname = "proxy"
+    nginx.vm.provider "virtualbox" do |nginx|
+      nginx.memory = 512
+      nginx.cpus = 1
+    end
+    nginx.vm.provision "shell", inline: <<-SHELL
+    apt-get update
+    apt-get install -y ansible
+    wget https://raw.githubusercontent.com/narko2t/devops-hometasks/master/02-ansible/2/playbook_proxy.yml -O /home/vagrant/playbook.yml
+    ansible-playbook playbook.yml
+    SHELL
+  end
+
+end

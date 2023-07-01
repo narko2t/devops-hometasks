@@ -1,0 +1,21 @@
+---
+- hosts: localhost
+  become: true
+  
+  tasks:
+    - name: Install Nginx
+      apt:
+        name: nginx
+        state: present
+
+    - name: Copy config file
+      get_url:
+        url: "https://raw.githubusercontent.com/narko2t/devops-hometasks/master/02-ansible/2/conf" # new file
+        dest: /etc/nginx/sites-available/default # old file
+      notify: Restart Nginx
+
+  handlers:
+    - name: Restart Nginx
+      service:
+        name: nginx
+        state: restarted

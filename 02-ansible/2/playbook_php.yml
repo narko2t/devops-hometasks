@@ -1,0 +1,35 @@
+---
+- hosts: localhost
+  become: true
+  
+  tasks:
+    - name: Install Apache and PHP
+      apt:
+        name: 
+        - apache2
+        - php
+        - libapache2-mod-php
+        state: present
+
+    - name: Create directory php
+      file:
+        path: /var/www/php
+        state: directory
+    - name: Copy php file
+      get_url:
+        url: "https://raw.githubusercontent.com/narko2t/devops-hometasks/master/01-vagrant/index.php" # new HTML file
+        dest: /var/www/php/index.php
+      notify: Restart Apache
+
+    - name: Changing 000-default configs
+      replace:
+        path: /etc/apache2/sites-available/000-default.conf
+        regexp: 'DocumentRoot /var/www/html'
+        replace: 'DocumentRoot /var/www/php'
+      notify: Restart Apache
+
+  handlers:
+    - name: Restart Apache
+      service:
+        name: apache2
+        state: restarted
