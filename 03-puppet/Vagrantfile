@@ -3,8 +3,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "slave1.puppet" do |slave1|
     slave1.vm.network "private_network", ip: "192.168.21.11"
+    slave1.vm.hostname = "slave1.puppet"
     slave1.vm.provider "virtualbox" do |slave1|
-      slave1.name = "slave1.puppet"
       slave1.memory = 512
       slave1.cpus = 1
     end
@@ -18,8 +18,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "slave2.puppet" do |slave2|
     slave2.vm.network "private_network", ip: "192.168.21.12"
+    slave2.vm.hostname = "slave2.puppet"
     slave2.vm.provider "virtualbox" do |slave2|
-      slave2.name = "slave2.puppet"
       slave2.memory = 512
       slave2.cpus = 1
     end
@@ -33,8 +33,8 @@ Vagrant.configure("2") do |config|
 
   config.vm.define "master.puppet" do |master|
     master.vm.network "private_network", ip: "192.168.21.13"
+    master.vm.hostname = "master.puppet"
     master.vm.provider "virtualbox" do |master|
-      master.name = "master.puppet"
       master.memory = 1024
     end
     master.vm.provision "file", source: "inventory.ini", destination: "/home/vagrant/inventory.ini"
