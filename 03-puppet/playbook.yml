@@ -1,0 +1,92 @@
+---
+- name: Disable firewalld
+  hosts: all
+  become: true
+  tasks:
+    - name: Disable firewalld
+      systemd:
+        name: firewalld
+        state: stopped
+        enabled: no
+
+- name: Install Puppet Server in master
+  hosts: master
+  become: true
+  tasks:
+    - name: Install Puppet Server
+      yum:
+        name:
+        - puppetserver 
+        - git
+        state: present
+        
+    - name: Change 2g to 516m
+      replace:
+        path: /etc/sysconfig/puppetserver
+        regexp: 'Xms2g -Xmx2g'
+        replace: 'Xms516m -Xmx516m'
+
+    - name: Add agent in condig
+      blockinfile:
+        path: /etc/puppetlabs/puppet/puppet.conf
+        block: |
+          [agent]
+          server = master.puppet
+          runinterval = 1m
+
+    - name: Create autosign
+      copy:
+        content: |
+          slave1.puppet
+          slave2.puppet
+        dest: /etc/puppetlabs/puppet/autosign.conf  
+
+    - name: Enable and start Puppet Server service
+      service:
+        name: puppetserver
+        enabled: true
+        state: started
+
+    - name: Install r10k
+      shell: /opt/puppetlabs/puppet/bin/gem install r10k
+
+    - name: Create r10k directory
+      file:
+        path: /etc/puppetlabs/r10k
+        state: directory  
+
+    - name: Change destanation r10k config
+      copy:
+        src: /home/vagrant/r10k.yaml
+        dest: /etc/puppetlabs/r10k/r10k.yaml
+
+    - name: Run r10k deploy
+      shell: /opt/puppetlabs/puppet/bin/r10k deploy environment -p
+
+- name: Configure Puppet on slave1&2.puppet
+  hosts: slave
+  become: true
+  tasks:
+    - name: Add ip master in slave
+      lineinfile:
+        path: /etc/hosts
+        line: "192.168.21.13 master.puppet" 
+
+    - name: Install Puppet Agent
+      yum:
+        name: puppet-agent
+        state: present
+    
+    - name: Add agent in condig
+      blockinfile:
+        path: /etc/puppetlabs/puppet/puppet.conf
+        block: |
+          [agent]
+          server = master.puppet
+          runinterval = 1m
+
+    - name: Enable and start Puppet-agent service
+      service:
+        name: puppet
+        enabled: true
+        state: started

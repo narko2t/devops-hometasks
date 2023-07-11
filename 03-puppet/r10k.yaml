@@ -1,0 +1,7 @@
+---
+:cachedir: '/var/cache/r10k'
+
+:sources:
+  :my-org:
+    remote: 'https://github.com/narko2t/for_r10k.git'
+    basedir: '/etc/puppetlabs/code/environments'
