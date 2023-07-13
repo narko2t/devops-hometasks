@@ -9,12 +9,6 @@
         state: stopped
         enabled: no
 
-    - name: Install Puppet repository RPM
-      yum:
-        name: https://yum.puppet.com/puppet7-release-el-8.noarch.rpm
-        state: present 
-        #rpm -Uvh https://yum.puppet.com/puppet7-release-el-8.noarch.rpm
-
 - name: Install Puppet Server in master
   hosts: master
   become: true
