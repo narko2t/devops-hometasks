@@ -63,8 +63,14 @@
     - name: Run r10k deploy
       shell: /opt/puppetlabs/puppet/bin/r10k deploy environment -p
 
-- name: Configure Puppet on slave1&2.puppet
-  hosts: slave
+    - name: Enable and start Puppet-agent service
+      service:
+        name: puppet
+        enabled: true
+        state: started
+
+- name: Configure Puppet on slave1&2.puppet, minecraft
+  hosts: slave, mine
   become: true
   tasks:
     - name: Add ip master in slave

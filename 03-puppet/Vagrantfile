@@ -56,7 +56,7 @@ Vagrant.configure("2") do |config|
     master.vm.provision "shell", inline: <<-SHELL
       yum install -y ansible
       rpm -Uvh https://yum.puppet.com/puppet7-release-el-8.noarch.rpm
-      ansible-playbook -i inventory.ini playbook.yml -v
+      ansible-playbook -i inventory.ini playbook.yml
     SHELL
   end
 end
