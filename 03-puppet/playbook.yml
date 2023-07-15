@@ -39,6 +39,7 @@
         content: |
           slave1.puppet
           slave2.puppet
+          mineserver.puppet
         dest: /etc/puppetlabs/puppet/autosign.conf  
 
     - name: Enable and start Puppet Server service
