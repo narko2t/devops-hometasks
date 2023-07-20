@@ -4,47 +4,55 @@
     state: present
     update_cache: yes
 
-- name: Get Jenkins crumb
-  uri:
-    url: "http://localhost:8080/crumbIssuer/api/json"
-    method: POST
-    user: admin
-    password: admin
-    register: crumb_output
+- name: Add string in config
+  lineinfile:
+    path: /etc/default/jenkins
+    line: 'JAVA_ARGS="-Dhudson.security.csrf.DefaultCrumbIssuer.DISABLE_CSRF_PROTECTION=true"'
+    state: present
 
-- debug:
-    var: crumb_output.json.crumb
-
-#- name: Install plugins Jenkins
-#  jenkins_plugin:
-#    url: http://localhost
-#    username: admin
-#    password: admin
-#    token: "{{ lookup('file', 'token.txt') }}"
-#    state: present
-#    plugins:
-#      - locale:314.v22ce953dfe9e
-#      - configuration-as-code:1647.ve39ca_b_829b_42
-#      - golang:1.4
+- name: restart Jenkins
+  service:
+    name: jenkins
+    state: restarted
 
 - name: Creating the init.groovy.d directory
   file:
     path: /var/lib/jenkins/init.groovy.d
     state: directory
-  
+
 - name: Copying scripts to the init.groovy.d directory
-  copy:
-    src: /scripts/
-    dest: /var/lib/jenkins/init.groovy.d/
+  synchronize:
+    src: /home/vagrant/scripts/01-admin_user.groovy
+    dest: /var/lib/jenkins/init.groovy.d/01-admin_user.groovy
     #remote_src: true
 
 - name: Setting the owner and group for the init.groovy.d directory
-  file:
-    state: directory
-    owner: jenkins
+  replace:
+    #state: directory
+    #owner: jenkins
     path: /lib/systemd/system/jenkins.service
     regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"'
     replace: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+
+#- name: Get Jenkins crumb
+#  uri:
+#    url: "http://localhost:8080/crumbIssuer/api/json"
+#    method: POST
+#    user: admin
+#    password: admin
+#    register: crumb_output
+
+#- debug:
+#    var: crumb_output.json.crumb
+
+- name: Install plugins Jenkins
+  jenkins_plugin:
+    url: http://localhost
+    state: present
+    name:
+      - locale:314.v22ce953dfe9e
+      - configuration-as-code:1647.ve39ca_b_829b_42
+      - golang:1.4
 
 - name: Copying jenkins.uaml home directory
   copy:

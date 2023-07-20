@@ -83,3 +83,41 @@ sudo ansible-playbook playbook.yml
 sudo ansible-playbook playbook.yml
 sudo ansible-playbook playbook.yml
 exit
+systemctl status jenkins
+cd /var/lib/jenkins/
+ls -la
+cd /lib/systemd/system/
+cat jenkins.service 
+св
+cd
+cd /var/lib/jenkins/
+ls -la
+cd /etc/default/
+ls -la
+cd jenkins
+sudo nano jenkins 
+sudo systemctl restart jenkins
+systemctl status jenkins
+cd
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+exit
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+exit
+ls -la
+cd scripts/
+ls -al
+cd
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+sudo ansible-playbook playbook.yml
+exit
