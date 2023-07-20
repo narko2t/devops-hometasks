@@ -4,17 +4,6 @@
     state: present
     update_cache: yes
 
-- name: Add string in config
-  lineinfile:
-    path: /etc/default/jenkins
-    line: 'JAVA_ARGS="-Dhudson.security.csrf.DefaultCrumbIssuer.DISABLE_CSRF_PROTECTION=true"'
-    state: present
-
-- name: restart Jenkins
-  service:
-    name: jenkins
-    state: restarted
-
 - name: Creating the init.groovy.d directory
   file:
     path: /var/lib/jenkins/init.groovy.d
@@ -22,9 +11,8 @@
 
 - name: Copying scripts to the init.groovy.d directory
   synchronize:
-    src: /home/vagrant/scripts/01-admin_user.groovy
-    dest: /var/lib/jenkins/init.groovy.d/01-admin_user.groovy
-    #remote_src: true
+    src: /home/vagrant/scripts/
+    dest: /var/lib/jenkins/init.groovy.d/
 
 - name: Setting the owner and group for the init.groovy.d directory
   replace:
@@ -34,6 +22,10 @@
     regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"'
     replace: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
 
+- name: restart Jenkins
+  service:
+    name: jenkins
+    state: restarted
 #- name: Get Jenkins crumb
 #  uri:
 #    url: "http://localhost:8080/crumbIssuer/api/json"
