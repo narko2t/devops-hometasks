@@ -11,21 +11,15 @@
 
 - name: Copying scripts to the init.groovy.d directory
   synchronize:
-    src: /home/vagrant/scripts/
-    dest: /var/lib/jenkins/init.groovy.d/
+    src: /home/vagrant/scripts/01-admin_user.groovy
+    dest: /var/lib/jenkins/init.groovy.d/01-admin_user.groovy
 
-- name: Setting the owner and group for the init.groovy.d directory
+- name: Change service jenkins
   replace:
-    #state: directory
-    #owner: jenkins
     path: /lib/systemd/system/jenkins.service
     regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"'
-    replace: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+    replace: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"'
 
-- name: restart Jenkins
-  service:
-    name: jenkins
-    state: restarted
 #- name: Get Jenkins crumb
 #  uri:
 #    url: "http://localhost:8080/crumbIssuer/api/json"
@@ -37,19 +31,25 @@
 #- debug:
 #    var: crumb_output.json.crumb
 
+- name: restart Jenkins
+  service:
+    name: jenkins
+    state: restarted
+
 - name: Install plugins Jenkins
   jenkins_plugin:
-    url: http://localhost
+    url: http://localhost:8080
+    url_username: admin
+    url_password: admin
     state: present
-    name:
-      - locale:314.v22ce953dfe9e
-      - configuration-as-code:1647.ve39ca_b_829b_42
-      - golang:1.4
+    name: "{{ item }}"
+    timeout: 100
+  loop: "{{ plugins }}"
 
-- name: Copying jenkins.uaml home directory
+- name: Copying jenkins.yaml home directory
   copy:
     src: jenkins.yaml
-    dest: /home/jenkins/jenkins.yaml
+    dest: /var/lib/jenkins/jenkins.yaml
 
 - name: Updating the service configuration
   systemd:
