@@ -1,0 +1,14 @@
+FROM golang:1.16 as builder
+
+RUN apt-get update && apt-get install -y git make
+WORKDIR /root/word-cloud-generator
+RUN git clone https://github.com/Fenikks/word-cloud-generator.git /root/word-cloud-generator
+RUN make
+
+FROM alpine:latest
+
+RUN apk update && apk add bash
+WORKDIR /usr/local/bin/word-cloud-generator
+COPY --from=builder /root/word-cloud-generator/artifacts/linux/word-cloud-generator /usr/local/bin/word-cloud-generator
+EXPOSE 8888
+CMD ["word-cloud-generator"]
