@@ -14,7 +14,7 @@
   become: true
   tasks:
     - name: Install Puppet Server
-      yum:
+      yum: # устанавилвать нужно просто в name ссылку на репозиторий и все
         name:
         - puppetserver 
         - git
@@ -23,11 +23,11 @@
     - name: Change 2g to 516m
       replace:
         path: /etc/sysconfig/puppetserver
-        regexp: 'Xms2g -Xmx2g'
-        replace: 'Xms516m -Xmx516m'
+        regexp: 'Xm2g -Xmx2g' # -Xm(s|x)g
+        replace: 'Xms516m -Xmx516m' # -Xm\g<1>516m
 
     - name: Add agent in condig
-      blockinfile:
+      blockinfile: # нудно заменить на модуль ini
         path: /etc/puppetlabs/puppet/puppet.conf
         block: |
           [agent]
@@ -49,7 +49,7 @@
         state: started
 
     - name: Install r10k
-      shell: /opt/puppetlabs/puppet/bin/gem install r10k
+      shell: /opt/puppetlabs/puppet/bin/gem install r10k # нужно через модуль gem вместе с user_install: false
 
     - name: Create r10k directory
       file:
@@ -62,7 +62,7 @@
         dest: /etc/puppetlabs/r10k/r10k.yaml
 
     - name: Run r10k deploy
-      shell: /opt/puppetlabs/puppet/bin/r10k deploy environment -p
+      shell: /opt/puppetlabs/puppet/bin/r10k deploy environment -p # нужно яерез модуль crone
 
     - name: Enable and start Puppet-agent service
       service:
