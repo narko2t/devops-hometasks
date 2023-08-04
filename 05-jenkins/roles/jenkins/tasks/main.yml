@@ -4,21 +4,21 @@
     state: present
     update_cache: yes
 
-- name: Creating the init.groovy.d directory
-  file:
-    path: /var/lib/jenkins/init.groovy.d
-    state: directory
+#- name: Creating the init.groovy.d directory
+#  file:
+#    path: /var/lib/jenkins/init.groovy.d
+#    state: directory
 
-- name: Copying scripts to the init.groovy.d directory
-  synchronize:
-    src: /home/vagrant/scripts/01-admin_user.groovy
-    dest: /var/lib/jenkins/init.groovy.d/01-admin_user.groovy
+#- name: Copying scripts to the init.groovy.d directory
+#  synchronize:
+#    src: /home/vagrant/scripts/01-admin_user.groovy
+#    dest: /var/lib/jenkins/init.groovy.d/01-admin_user.groovy
 
-- name: Change service jenkins
-  replace:
-    path: /lib/systemd/system/jenkins.service
-    regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"'
-    replace: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"'
+#- name: Change service jenkins
+#  replace:
+#   path: /lib/systemd/system/jenkins.service
+#   regexp: '^Environment="JAVA_OPTS=-Djava.awt.headless=true"'
+#   replace: 'Environment="JAVA_OPTS=-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false -Dhudson.security.csrf.GlobalCrumbIssuerConfiguration.DISABLE_CSRF_PROTECTION=true"'
 
 #- name: Get Jenkins crumb
 #  uri:
@@ -31,31 +31,31 @@
 #- debug:
 #    var: crumb_output.json.crumb
 
-- name: restart Jenkins
-  service:
-    name: jenkins
-    state: restarted
+#- name: restart Jenkins
+#  service:
+#    name: jenkins
+#    state: restarted
 
-- name: Install plugins Jenkins
-  jenkins_plugin:
-    url: http://localhost:8080
-    url_username: admin
-    url_password: admin
-    state: present
-    name: "{{ item }}"
-    timeout: 100
-  loop: "{{ plugins }}"
+#- name: Install plugins Jenkins
+#  jenkins_plugin:
+#    url: http://localhost:8080
+#    url_username: admin
+#    url_password: admin
+#    state: present
+#    name: "{{ item }}"
+#    timeout: 100
+#  loop: "{{ plugins }}"
 
-- name: Copying jenkins.yaml home directory
-  copy:
-    src: jenkins.yaml
-    dest: /var/lib/jenkins/jenkins.yaml
+#- name: Copying jenkins.yaml home directory
+# copy:
+#    src: jenkins.yaml
+#    dest: /var/lib/jenkins/jenkins.yaml
 
-- name: Updating the service configuration
-  systemd:
-    daemon_reload: yes
+#- name: Updating the service configuration
+#  systemd:
+#    daemon_reload: yes
 
-- name: restart Jenkins
-  service:
-    name: jenkins
-    state: restarted    
+#- name: restart Jenkins
+#  service:
+#    name: jenkins
+#    state: restarted    
