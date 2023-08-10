@@ -28,8 +28,8 @@ pipeline {
         stage('Build') {
             steps {
                 sh '''sed -i "s/1.DEVELOPMENT/1.$BUILD_NUMBER/g" static/version
-                          GOOS=linux GOARCH=amd64 go build -o ./artifacts/word-cloud-generator -v
-                          gzip -f artifacts/word-cloud-generator
+                      GOOS=linux GOARCH=amd64 go build -o ./artifacts/word-cloud-generator -v
+                      gzip -f artifacts/word-cloud-generator
                    '''
             }
         }

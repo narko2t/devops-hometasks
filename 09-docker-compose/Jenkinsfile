@@ -1,0 +1,44 @@
+pipeline {
+    agent any
+    options {
+        timestamps()
+    }
+    tools { go 'go-1.16' }
+    environment {
+        NEXUS_HOST = '192.168.21.41'
+        USERNAME = 'admin'
+        PASSWORD = 'admin'
+    }
+    stages {
+        stage('Downloading source codes') {
+            steps {
+                git 'https://github.com/narko2t/word-cloud-generator-fortk-.git'
+            }
+        }
+
+        stage('Source code verification and tests') {
+            steps {
+                sh 'make lint'
+                sh 'make test'
+            }
+        }
+
+        stage('Build') {
+            steps {
+                sh '''sed -i "s/1.DEVELOPMENT/1.$BUILD_NUMBER/g" static/version
+                      GOOS=linux GOARCH=amd64 go build -o ./artifacts/word-cloud-generator -v
+                      gzip -f artifacts/word-cloud-generator
+                   '''
+            }
+        }
+
+
+        stage('Upload artifacts to the Nexus repository') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'for nexus', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
+                    nexusArtifactUploader artifacts: [[artifactId: 'word-cloud-generator', classifier: '', file: 'artifacts/word-cloud-generator.gz', type: 'gz']], credentialsId: 'for nexus', groupId: "pipeline-$BRANCH", nexusUrl: "$NEXUS_HOST:8081", nexusVersion: 'nexus3', protocol: 'http', repository: 'wcg-build', version: "1.$BUILD_NUMBER"
+                }
+            }
+        }
+    }
+}
