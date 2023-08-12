@@ -1,0 +1,51 @@
+name: hometask
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  REPO_OWNER: ${{ env.GITHUB_REPOSITORY_OWNER }}
+  TAG: ${{ github.sha }}
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: self-hosted
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          sparse-checkout: |
+            Dockerfile.multi
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+
+      - name: Log in to the Container registry
+        uses: docker/login-action@latest
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ env.REPO_OWNER }}
+          password: ${{ secrets.ACTION_TOKEN }}  
+
+      - name: Build Docker image
+        run: |
+          docker buildx build \
+            --file Dockerfile.multi \
+            --tag ghcr.io/${{ env.REPO_OWNER }}/wcg:${{ env.TAG }} \
+            --tag ghcr.io/${{ env.REPO_OWNER }}/wcg:latest \
+            --progress plain \
+            .
+      
+      - name: Push Docker image to GitHub Registry
+        run: |
+          docker push ghcr.io/${{ env.REPO_OWNER }}/wcg:${{ env.TAG }}
+          docker push ghcr.io/${{ env.REPO_OWNER }}/wcg:latest
