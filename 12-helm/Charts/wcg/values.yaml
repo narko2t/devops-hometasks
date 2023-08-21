@@ -11,12 +11,12 @@ container:
   name: word-cloud-generator
 
 image:
-  repo_owner: GITHUB_REPOSITORY_OWNER
+  repo_owner: GITHUB_REPOSITORY_OWNER #оунера не подставлял, так как не сделаны предыдущие домашки
   repository: wcg
   tag: 1.0.0
 
 ingress:
   enabled: true
-  hostname: Your_IP
+  hostname: Your_IP #ip не подставлял, так как у меня не сделаны предыдущие домашки, но в этой думаю все правильно
   path: /
   pathType: Prefix
