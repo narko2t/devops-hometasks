@@ -4,11 +4,11 @@ metadata:
   name: {{ .Chart.Name }}-ingress
 spec:
   rules:
-    - host: {{ .Values.ingrees.hostname }}
+    - host: {{ .Values.ingress.hostname }}
       http:
         paths:
-          - path: {{ .Values.ingrees.path }}
-            pathType: {{ .Values.ingrees.pathType }}
+          - path: {{ .Values.ingress.path }}
+            pathType: {{ .Values.ingress.pathType }}
             backend:
               service:
                 name: {{ .Values.service.name }}-svc
