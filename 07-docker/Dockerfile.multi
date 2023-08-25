@@ -7,8 +7,7 @@ RUN make
 
 FROM alpine:latest
 
-RUN apk update && apk add bash
-WORKDIR /usr/local/bin/word-cloud-generator
-COPY --from=builder /root/word-cloud-generator/artifacts/linux/word-cloud-generator /usr/local/bin/word-cloud-generator
+RUN apk update && apk add gcompat
+COPY --from=builder /root/word-cloud-generator/artifacts/linux/word-cloud-generator /usr/local/bin/
 EXPOSE 8888
 CMD ["word-cloud-generator"]
