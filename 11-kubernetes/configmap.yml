@@ -1,8 +1,8 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: envirement_for_configMAP
+  name: envirementforconfigmap
 data:
-  GITHUB_REPOSITORY_OWNER: Your_username
-  Host_IP: Your_IP
-  APP_PORT: 8888
+  GITHUB-REPOSITORY-OWNER: Your_username
+  Host-IP: Your_IP
+  APP_PORT: "8888"

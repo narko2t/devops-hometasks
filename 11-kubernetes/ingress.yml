@@ -4,7 +4,7 @@ metadata:
   name: wcg-ingress
 spec:
   rules:
-    - host: ${Host_IP}
+    - host: ${Host-IP}
       http:
         paths:
           - path: /
