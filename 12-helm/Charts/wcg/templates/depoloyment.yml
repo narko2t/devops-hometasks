@@ -17,4 +17,4 @@ spec:
           image: ghcr.io/{{ .Values.image.repo-owner }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
           ports:
             - name: app-port
-            - containerPort: {{ .Values.container.APP-PORT }}
+              containerPort: {{ .Values.container.APP-PORT }}

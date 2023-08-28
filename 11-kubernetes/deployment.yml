@@ -17,7 +17,7 @@ spec:
           image: ghcr.io/${GITHUB-REPOSITORY-OWNER}/wcg:latest
           ports:
             - name: app-port
-            - containerPort: ${APP-PORT}
+              containerPort: ${APP-PORT}
           envFrom:
             - configMapRef:
                 name: envirementforconfigmap
