@@ -14,10 +14,10 @@ spec:
     spec:
       containers:
         - name: word-cloud-generator
-          image: ghcr.io/${GITHUB-REPOSITORY-OWNER}/wcg:latest
+          image: ghcr.io/narko2t1/wcg:latest
           ports:
             - name: app-port
-              containerPort: ${APP-PORT}
-          envFrom:
-            - configMapRef:
-                name: envirementforconfigmap
+              containerPort: 8888
+          #envFrom:
+          #  - configMapRef:
+          #      name: envirementforconfigmap
