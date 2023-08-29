@@ -22,7 +22,7 @@ resource "kubernetes_deployment" "dp" {
       spec {
         container {
           image = var.image
-          name  = "word-cloud-generator"
+          name  = var.name
 
 
           #liveness_probe {

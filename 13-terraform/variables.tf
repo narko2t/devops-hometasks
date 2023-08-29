@@ -17,3 +17,8 @@ variable "replicas" {
   description = "number of replicas"
   type        = number
 }
+
+variable "name" {
+  description = "name of conteiner"
+  type        = string
+}
