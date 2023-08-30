@@ -22,3 +22,8 @@ variable "name" {
   description = "name of conteiner"
   type        = string
 }
+
+variable "token" {
+  description = "auth token github"
+  type        = string
+}
