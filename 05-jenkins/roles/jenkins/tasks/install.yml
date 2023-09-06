@@ -42,16 +42,16 @@
 
 - name: Configure default users
   template:
-    src: 01-admin-user.groovy
+    src: /vagrant/roles/jenkins/templates/01-admin_user.groovy
     dest: "{{ jenkins_home }}/init.groovy.d/00-basic-security.groovy"
     owner: "{{ jenkins_config_owner }}"
     group: "{{ jenkins_config_group }}"
     mode: 0775
-  notify: restart jenkins   
+  notify: restart jenkins
   
 - name: Configure jenkins.service
   template:
-    src: jenkins.service
+    src: /vagrant/roles/jenkins/templates/jenkins.service
     dest: "/lib/systemd/system/jenkins.service"
   notify: restart jenkins 
 
