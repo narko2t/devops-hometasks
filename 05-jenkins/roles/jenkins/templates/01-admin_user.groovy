@@ -6,8 +6,8 @@ import hudson.security.*
 
 println "--> creating admin user"
 
-def adminUsername = "admin"
-def adminPassword = "admin"
+def adminUsername = "{{ jenkins_user }}"
+def adminPassword = "{{ jenkins_password }}"
 
 def hudsonRealm = new HudsonPrivateSecurityRealm(false)
 hudsonRealm.createAccount(adminUsername, adminPassword)
