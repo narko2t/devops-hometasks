@@ -42,7 +42,7 @@
 
 - name: Configure default users
   template:
-    src: admin-user.groovy
+    src: 01-admin-user.groovy
     dest: "{{ jenkins_home }}/init.groovy.d/00-basic-security.groovy"
     owner: "{{ jenkins_config_owner }}"
     group: "{{ jenkins_config_group }}"
