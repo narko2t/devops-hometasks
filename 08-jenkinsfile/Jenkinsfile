@@ -3,18 +3,20 @@ pipeline {
     options {
         timestamps()
     }
-    tools { go 'go-1.16' }
     environment {
+        GO_VERSION = "go-1.16"
+        BRANCH = "master"
         NEXUS_HOST = '192.168.33.90'
         STAGING_HOST = '192.168.33.80'
         PRODUCTION_HOST = '192.168.33.85'
         USERNAME = 'narko2t1'
         PASSWORD = 'narko2t1'
     }
+    tools { go $GO_VERSION }
     stages {
         stage('Downloading source codes') {
             steps {
-                git 'https://github.com/narko2t/word-cloud-generator-fortk-.git'
+                git branch: "$BRANCH", url: 'https://github.com/narko2t/word-cloud-generator-fortk-.git'
             }
         }
 
@@ -29,7 +31,9 @@ pipeline {
             steps {
                 sh '''sed -i "s/1.DEVELOPMENT/1.$BUILD_NUMBER/g" static/version
                       GOOS=linux GOARCH=amd64 go build -o ./artifacts/word-cloud-generator -v
+                      md5sum artifacts/word-cloud-generator
                       gzip -f artifacts/word-cloud-generator
+                      ls -l artifacts/
                    '''
             }
         }
@@ -47,8 +51,8 @@ pipeline {
             steps {
                 withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                     sh '''ssh vagrant@$STAGING_HOST sudo service wordcloud stop
-                          scp systemd_servies vagrant@$STAGING_HOST:/etc/systemd/system/wordcloud.service
                           ssh vagrant@$STAGING_HOST curl -X GET http://$NEXUS_HOST:8081/repository/wcg-build/pipeline-$BRANCH/word-cloud-generator/1.$BUILD_NUMBER/word-cloud-generator-1.$BUILD_NUMBER.gz -o /opt/wordcloud/word-cloud-generator.gz -u $USERNAME:$PASSWORD
+                          ssh vagrant@$STAGING_HOST 'ls -l /opt/wordcloud'
                           ssh vagrant@$STAGING_HOST gunzip -f /opt/wordcloud/word-cloud-generator.gz
                           ssh vagrant@$STAGING_HOST chmod +x /opt/wordcloud/word-cloud-generator
                           ssh vagrant@$STAGING_HOST sudo service wordcloud start
@@ -61,24 +65,22 @@ pipeline {
             parallel {
                 stage('Test 1') {
                     steps {
-                        withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                           sh '''ssh vagrant@$STAGING_HOST res=`curl -s -H "Content-Type: application/json" -d '{"text":"ths is a really really really important thing this is"}' http://$STAGING_HOST:8888/version | jq '. | length'` -u $USERNAME:$PASSWORD
-                                 ssh vagrant@$STAGING_HOST if [ "1" != "$res" ]; then
-                                 ssh vagrant@$STAGING_HOST exit 99
-                                 ssh vagrant@$STAGING_HOST fi
-                           '''
+                        script {
+                            def res = sh(script: 'curl -s -H "Content-Type: application/json" -d \'{"text":"ths is a really really really important thing this is"}\' http://$STAGING_IP:8888/api | jq \'. | length\'', returnStdout: true).trim()
+                            if [ res != '7' ] {
+                            	error 'Test №1 failed'
+                            }
                         }
                     }
                 }
 
                 stage('Test 2') {
                     steps {
-                        withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
-                           sh '''ssh vagrant@$STAGING_HOST res=`curl -s -H "Content-Type: application/json" -d '{"text":"ths is a really really really important thing this is"}' http://$STAGING_HOST:8888/api | jq '. | length'` -u $USERNAME:$PASSWORD
-                                 ssh vagrant@$STAGING_HOST if [ "7" != "$res" ]; then
-                                 ssh vagrant@$STAGING_HOST exit 99
-                                 ssh vagrant@$STAGING_HOST fi
-                           '''
+                        script {
+                            def res=`curl -s -H "Content-Type: application/json" -d '{"text":"ths is a really really really important thing this is"}' http://$STAGING_HOST:8888/api | jq '. | length'`
+                            if [ "7" != "$res" ] {
+                                error 'Test №2 failed'
+                            }
                         }
                     }
                 }
@@ -91,8 +93,8 @@ pipeline {
                     steps {
                         withCredentials([usernamePassword(credentialsId: 'nexus-creds', passwordVariable: 'PASSWORD', usernameVariable: 'USERNAME')]) {
                             sh '''ssh vagrant@$PRODUCTION_HOST sudo service wordcloud stop
-                                  scp systemd_servies vagrant@$PRODUCTION_HOST:/etc/systemd/system/wordcloud.service
-                                  ssh vagrant@$PRODUCTION_HOST curl -X GET http://$NEXUS_HOST:8081/repository/wcg-build/pipeline-$BRANCH/word-cloud-generator/1.$BUILD_NUMBER/word-cloud-generator-1.$BUILD_NUMBER.gz -o /opt/wordcloud/word-cloud-generator.gz -u $USERNAME:$PASSWORD
+                                  ssh vagrant@$PRODUCTION_HOST curl -X GET http://$NEXUS_HOST:8081/repository/wcg-build/pipeline-$BRANCH/word-cloud-generator/1.$BUILD_NUMBER/word-cloud-generator-1.$BUILD_NUMBER.gz -o /opt/wordcloud/word-cloud-generator.gz
+                                  ssh vagrant@$PRODUCTION_HOST 'ls -l /opt/wordcloud'
                                   ssh vagrant@$PRODUCTION_HOST gunzip -f /opt/wordcloud/word-cloud-generator.gz
                                   ssh vagrant@$PRODUCTION_HOST chmod +x /opt/wordcloud/word-cloud-generator
                                   ssh vagrant@$PRODUCTION_HOST sudo service wordcloud start
