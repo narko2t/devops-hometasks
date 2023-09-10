@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    paths:
+      - .github/workflows/workflow_ht.yml
   workflow_dispatch:
 
 env:
