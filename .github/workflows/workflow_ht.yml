@@ -27,6 +27,32 @@ jobs:
       - name: set lower case owner name
         run: echo "REPO_OWNER_LC=${REPO_OWNER,,}" >>${GITHUB_ENV}
 
+      - name: checkout repository
+        uses: actions/checkout@v3
+
+      - name: version and tag
+        uses: anothrNick/github-tag-action@1.64.0
+        id: tag_version
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          WITH_V: false
+      
+      - name: install Helm
+        uses: azure/setup-helm@v3
+      
+      - name: validate helm chart
+        run: helm lint 12-helm/Charts/wcg/
+
+      - name: helm package
+        run: helm package 12-helm/ --version ${{ steps.tag_version.outputs.new_tag }} --app-version ${{ steps.tag_version.outputs.new_tag }} .
+
+      - name: update/create help index.yaml
+        run: helm repo index . --url ${{ env.GITHUB_URL }}
+
+      - name: commit helm package
+        uses: stefanzweifel/git-auto-commit-action@v4
+
+      
       #- name: Print env
       #  run: echo "github_actor:=${{ github.actor }} repo_owner:= $REPO_OWNER repo_owner_lc:= $REPO_OWNER_LC  docker_tag:= $TAG"  
       
