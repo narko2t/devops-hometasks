@@ -4,7 +4,7 @@ metadata:
   name: {{ .Values.service.name }}-svc
 spec:
   selector:
-    app: {{ .Values.container.label }}
+    {{ .Values.container.label.key }}: {{ .Values.container.label.value }}
   ports:
     - protocol: TCP
       port: {{ .Values.service.port }}

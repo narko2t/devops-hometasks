@@ -6,15 +6,15 @@ spec:
   replicas: {{ .Values.replicas }}
   selector:
     matchLabels:
-      app: {{ .Values.container.label }}
+      {{ .Values.container.label.key }}: {{ .Values.container.label.value }}
   template:
     metadata:
       labels:
-        app: {{ .Values.container.label }}
+        {{ .Values.container.label.key }}: {{ .Values.container.label.value }}
     spec:
       containers:
         - name: {{ .Values.container.name }}
-          image: ghcr.io/{{ .Values.image.repo-owner }}/{{ .Values.image.repository }}:{{ .Values.image.tag }}
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion}}
           ports:
             - name: app-port
-              containerPort: {{ .Values.container.APP-PORT }}
+              containerPort: {{ .Values.container.app_port }}

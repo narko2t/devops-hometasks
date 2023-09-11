@@ -6,17 +6,18 @@ service:
   port: "80"
 
 container:
-  label: word-cloud-generator
-  APP-PORT: "8888"
-  name: word-cloud-generator
+  label: 
+    key: app
+    value: word-cloud-generator
+  app_port: "8888"
+  name: wcg
 
 image:
-  repo-owner: GITHUB-REPOSITORY-OWNER #оунера не подставлял, так как не сделаны предыдущие домашки
-  repository: wcg
-  tag: "1.0.0"
+  repository: ghcr.io/narko2t/wcg
+  tag: ""
 
 ingress:
-  enabled: true
-  hostname: dnsname #не подставлял, так как у меня не сделаны предыдущие домашки, но в этой думаю все правильно
-  path: /
+  #enabled: true
+  hostname: site.local #
+  path: /wcg
   pathType: Prefix
